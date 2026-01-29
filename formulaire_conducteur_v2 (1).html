@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire de Conducteur - Location de Voiture</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2C5F8D 0%, #1a3a5c 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .form-content {
+            padding: 40px;
+        }
+        
+        /* Client Type Selection */
+        .client-type-section {
+            margin-bottom: 32px;
+        }
+        
+        .client-type-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .client-type-btn {
+            padding: 20px;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            background: #fafafa;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .client-type-btn:hover {
+            border-color: #2C5F8D;
+            background: #f0f4f8;
+        }
+        
+        .client-type-btn.active {
+            border-color: #2C5F8D;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: #2C5F8D;
+        }
+        
+        .client-type-btn input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+        }
+        
+        /* Section Blocking */
+        .form-section {
+            margin-bottom: 32px;
+            padding: 24px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            transition: all 0.3s;
+        }
+        
+        .form-section.locked {
+            opacity: 0.5;
+            pointer-events: none;
+            background: #f5f5f5;
+        }
+        
+        .form-section.locked::before {
+            content: '🔒';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+        }
+        
+        .form-section {
+            position: relative;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2C5F8D;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+        
+        .form-group .hint {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            background: #fafafa;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2C5F8D;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(44, 95, 141, 0.1);
+        }
+        
+        .form-group input:disabled,
+        .form-group textarea:disabled {
+            background: #f0f0f0;
+            cursor: not-allowed;
+        }
+        
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        /* Reference and Email Row */
+        .ref-email-row {
+            display: grid;
+            grid-template-columns: 40% 1fr;
+            gap: 16px;
+            align-items: end;
+        }
+        
+        .search-btn {
+            padding: 12px 24px;
+            background: #2C5F8D;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 24px;
+        }
+        
+        .search-btn:hover {
+            background: #1a3a5c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(44, 95, 141, 0.3);
+        }
+        
+        .search-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Edit Icons for Prefilled Fields */
+        .editable-field {
+            position: relative;
+        }
+        
+        .edit-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        
+        .edit-icon:hover {
+            opacity: 1;
+        }
+        
+        /* Calendar Styles */
+        .calendar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .calendar-overlay.active {
+            display: flex;
+        }
+        
+        .calendar-container {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-nav {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        
+        .calendar-nav:hover {
+            background: #f0f0f0;
+        }
+        
+        .calendar-month-year {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2C5F8D;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+            color: #666;
+            padding: 8px 0;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        
+        .calendar-day:hover:not(.disabled):not(.other-month) {
+            background: #e3f2fd;
+            border-color: #2C5F8D;
+        }
+        
+        .calendar-day.selected {
+            background: #2C5F8D;
+            color: white;
+            font-weight: 700;
+        }
+        
+        .calendar-day.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .calendar-day.other-month {
+            color: #ccc;
+        }
+        
+        .calendar-day.today {
+            border: 2px solid #2C5F8D;
+            font-weight: 600;
+        }
+        
+        .calendar-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .calendar-close:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        /* Date inputs with calendar icon */
+        .date-input {
+            position: relative;
+        }
+        
+        .date-input input {
+            padding-right: 40px;
+            cursor: pointer;
+        }
+        
+        .date-input::after {
+            content: '📅';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            font-size: 18px;
+        }
+        
+        /* Days calculation display */
+        .days-display {
+            margin-top: 16px;
+            padding: 16px;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-radius: 8px;
+            border-left: 4px solid #4caf50;
+            font-size: 16px;
+            font-weight: 600;
+            color: #2e7d32;
+            display: none;
+        }
+        
+        .days-display.show {
+            display: block;
+        }
+        
+        /* Error states */
+        .form-group input.error,
+        .form-group textarea.error {
+            border-color: #dc3545;
+            background: #fff5f5;
+        }
+        
+        .error-message {
+            display: none;
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        /* Info Box */
+        .info-box {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 32px;
+        }
+        
+        .info-box h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #856404;
+            margin-bottom: 12px;
+        }
+        
+        .info-box ul {
+            list-style: none;
+            font-size: 13px;
+            color: #856404;
+        }
+        
+        .info-box li {
+            padding-left: 20px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        .info-box li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        /* Button Group */
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 32px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #2C5F8D 0%, #1a3a5c 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(44, 95, 141, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #2C5F8D;
+            border: 2px solid #2C5F8D;
+        }
+        
+        .btn-secondary:hover {
+            background: #f0f4f8;
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Print styles */
+        @media print {
+            @page {
+                size: A4;
+                margin: 15mm;
+            }
+            
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+            
+            .button-group,
+            .search-btn,
+            .client-type-section,
+            .edit-icon {
+                display: none !important;
+            }
+            
+            .form-section.locked {
+                opacity: 1;
+                pointer-events: auto;
+                background: white;
+            }
+            
+            .form-section.locked::before {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 Formulaire de Conducteur</h1>
+            <p>Location de Voiture - Informations du Conducteur</p>
+        </div>
+        
+        <div class="form-content">
+            <form id="driverForm">
+                <!-- Client Type Selection -->
+                <div class="client-type-section">
+                    <div class="section-title">Type de Client</div>
+                    <div class="client-type-buttons">
+                        <label class="client-type-btn" id="nouveauClientBtn">
+                            <input type="radio" name="client_type" value="nouveau" required>
+                            <span>🆕 Nouveau Client</span>
+                        </label>
+                        <label class="client-type-btn" id="existantClientBtn">
+                            <input type="radio" name="client_type" value="existant" required>
+                            <span>👤 Client Existant</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Reference and Email Section -->
+                <div class="form-section locked" id="refEmailSection">
+                    <div class="section-title">Référence & Contact</div>
+                    
+                    <div class="ref-email-row">
+                        <div class="form-group">
+                            <label for="reference_agence">Référence Agence *</label>
+                            <input type="text" id="reference_agence" name="reference_agence" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">📧 Email *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="search-btn" id="searchBtn" style="display: none;">
+                        🔍 RECHERCHER
+                    </button>
+                </div>
+                
+                <!-- Dates Section -->
+                <div class="form-section locked" id="datesSection">
+                    <div class="section-title">📅 Période de Location</div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label for="date_prise">Date de Prise en Charge *</label>
+                            <span class="hint">Format: JJ/MM/AAAA</span>
+                            <div class="date-input">
+                                <input type="text" id="date_prise" name="date_prise" 
+                                       placeholder="01/01/2024" 
+                                       pattern="\d{2}/\d{2}/\d{4}" 
+                                       required
+                                       readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="date_restitution">Date de Restitution *</label>
+                            <span class="hint">Format: JJ/MM/AAAA</span>
+                            <div class="date-input">
+                                <input type="text" id="date_restitution" name="date_restitution" 
+                                       placeholder="01/01/2024" 
+                                       pattern="\d{2}/\d{2}/\d{4}" 
+                                       required
+                                       readonly>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="days-display" id="daysDisplay">
+                        📊 Durée de location: <span id="daysCount">0</span> jour(s)
+                    </div>
+                </div>
+                
+                <!-- Personal Info Section -->
+                <div class="form-section locked" id="personalInfoSection">
+                    <div class="section-title">👤 Informations Personnelles</div>
+                    
+                    <div class="form-group">
+                        <label for="nom_complet">Nom Complet *</label>
+                        <span class="hint">Nom et prénom comme sur la pièce d'identité</span>
+                        <input type="text" id="nom_complet" name="nom_complet" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="adresse_complete">Adresse Complète *</label>
+                        <span class="hint">Maximum 3 lignes - Rue, Code postal, Ville</span>
+                        <textarea id="adresse_complete" name="adresse_complete" required 
+                                  placeholder="Rue et numéro&#10;Code postal et ville&#10;Pays"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="telephone">Téléphone *</label>
+                        <span class="hint">Format international (commence par +)</span>
+                        <input type="tel" id="telephone" name="telephone" 
+                               value="+" 
+                               pattern="\+[0-9]{7,15}" 
+                               required>
+                    </div>
+                </div>
+                
+                <!-- ID Document Section -->
+                <div class="form-section locked" id="idDocSection">
+                    <div class="section-title">🪪 Pièce d'Identité</div>
+                    
+                    <div class="form-group">
+                        <label for="numero_document">Numéro du Document *</label>
+                        <span class="hint">Carte d'identité ou passeport</span>
+                        <input type="text" id="numero_document" name="numero_document" required>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label for="date_emission_id">Date d'Émission *</label>
+                            <span class="hint">Format: JJ/MM/AAAA</span>
+                            <div class="date-input">
+                                <input type="text" id="date_emission_id" name="date_emission_id" 
+                                       placeholder="01/01/2024" 
+                                       pattern="\d{2}/\d{2}/\d{4}" 
+                                       required
+                                       readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="date_expiration_id">Date d'Expiration *</label>
+                            <span class="hint">Doit être postérieure à la date de restitution</span>
+                            <div class="date-input">
+                                <input type="text" id="date_expiration_id" name="date_expiration_id" 
+                                       placeholder="01/01/2024" 
+                                       pattern="\d{2}/\d{2}/\d{4}" 
+                                       required
+                                       readonly>
+                            </div>
+                            <div class="error-message" id="error_expiration_id">
+                                ⚠️ La date d'expiration doit être après la date de restitution
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Driver License Section -->
+                <div class="form-section locked" id="licenseSection">
+                    <div class="section-title">🚘 Permis de Conduire</div>
+                    
+                    <div class="form-group">
+                        <label for="numero_permis">Numéro du Permis *</label>
+                        <input type="text" id="numero_permis" name="numero_permis" required>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label for="date_emission_permis">Date d'Émission *</label>
+                            <span class="hint">Format: JJ/MM/AAAA</span>
+                            <div class="date-input">
+                                <input type="text" id="date_emission_permis" name="date_emission_permis" 
+                                       placeholder="01/01/2024" 
+                                       pattern="\d{2}/\d{2}/\d{4}" 
+                                       required
+                                       readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="date_expiration_permis">Date d'Expiration *</label>
+                            <span class="hint">Doit être postérieure à la date de restitution</span>
+                            <div class="date-input">
+                                <input type="text" id="date_expiration_permis" name="date_expiration_permis" 
+                                       placeholder="01/01/2024" 
+                                       pattern="\d{2}/\d{2}/\d{4}" 
+                                       required
+                                       readonly>
+                            </div>
+                            <div class="error-message" id="error_expiration_permis">
+                                ⚠️ La date d'expiration doit être après la date de restitution
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Info Box -->
+                <div class="info-box">
+                    <h3>⚠️ Informations importantes</h3>
+                    <ul>
+                        <li>Tous les champs marqués d'un astérisque (*) sont obligatoires</li>
+                        <li>Les dates doivent être au format JJ/MM/AAAA</li>
+                        <li>Les documents (carte d'identité et permis) doivent être valides pendant toute la durée de la location</li>
+                        <li>Le numéro de téléphone doit commencer par le code pays (ex: +351 pour Portugal)</li>
+                    </ul>
+                </div>
+                
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="clearForm()">
+                        🗑️ Effacer
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="exportToPDF()">
+                        📄 Exporter PDF
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="submitToSheets()" id="submitBtn">
+                        ✅ Envoyer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Calendar Overlay -->
+    <div class="calendar-overlay" id="calendarOverlay">
+        <div class="calendar-container">
+            <button class="calendar-close" onclick="closeCalendar()">✕</button>
+            <div class="calendar-header">
+                <button type="button" class="calendar-nav" onclick="changeMonth(-1)">‹</button>
+                <div class="calendar-month-year" id="calendarMonthYear"></div>
+                <button type="button" class="calendar-nav" onclick="changeMonth(1)">›</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURATION
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyV3BddhAQIxJYARoDwwPE0QUMrfZweyAbTwrTCw_bC5rfFo5zUyEZPO19SX4achWo/exec';
+        
+        // Global variables
+        let currentCalendarDate = new Date();
+        let currentInputId = null;
+        let clientType = null;
+        let isExistingClientData = false;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeClientTypeSelection();
+            initializeFormValidation();
+            initializeDateInputs();
+            initializePhoneValidation();
+            initializeAddressValidation();
+            checkURLParameters();
+        });
+        
+        // Check URL parameters for existing client
+        function checkURLParameters() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ref = urlParams.get('ref');
+            const token = urlParams.get('token');
+            
+            if (ref && token) {
+                // Auto-select existing client
+                document.querySelector('input[value="existant"]').checked = true;
+                handleClientTypeChange('existant');
+                document.getElementById('reference_agence').value = ref;
+                
+                // Fetch client data
+                fetchExistingClientData(ref, token);
+            }
+        }
+        
+        // Client Type Selection
+        function initializeClientTypeSelection() {
+            const radioButtons = document.querySelectorAll('input[name="client_type"]');
+            
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const buttons = document.querySelectorAll('.client-type-btn');
+                    buttons.forEach(btn => btn.classList.remove('active'));
+                    
+                    this.closest('.client-type-btn').classList.add('active');
+                    clientType = this.value;
+                    
+                    handleClientTypeChange(this.value);
+                });
+            });
+        }
+        
+        function handleClientTypeChange(type) {
+            const refEmailSection = document.getElementById('refEmailSection');
+            const searchBtn = document.getElementById('searchBtn');
+            
+            // Unlock reference/email section
+            refEmailSection.classList.remove('locked');
+            
+            if (type === 'existant') {
+                searchBtn.style.display = 'block';
+            } else {
+                searchBtn.style.display = 'none';
+            }
+        }
+        
+        // Form Validation and Progressive Unlocking
+        function initializeFormValidation() {
+            const refInput = document.getElementById('reference_agence');
+            const emailInput = document.getElementById('email');
+            
+            refInput.addEventListener('input', checkRefEmailSection);
+            emailInput.addEventListener('input', checkRefEmailSection);
+            
+            // Date inputs
+            const datePriseInput = document.getElementById('date_prise');
+            const dateRestitutionInput = document.getElementById('date_restitution');
+            
+            datePriseInput.addEventListener('change', checkDatesSection);
+            dateRestitutionInput.addEventListener('change', checkDatesSection);
+            
+            // Personal info
+            const nomInput = document.getElementById('nom_complet');
+            const adresseInput = document.getElementById('adresse_complete');
+            const telInput = document.getElementById('telephone');
+            
+            nomInput.addEventListener('input', checkPersonalInfoSection);
+            adresseInput.addEventListener('input', checkPersonalInfoSection);
+            telInput.addEventListener('input', checkPersonalInfoSection);
+            
+            // ID Document
+            const numeroDocInput = document.getElementById('numero_document');
+            const dateEmissionIdInput = document.getElementById('date_emission_id');
+            const dateExpirationIdInput = document.getElementById('date_expiration_id');
+            
+            numeroDocInput.addEventListener('input', checkIdDocSection);
+            dateEmissionIdInput.addEventListener('change', checkIdDocSection);
+            dateExpirationIdInput.addEventListener('change', checkIdDocSection);
+        }
+        
+        function checkRefEmailSection() {
+            const ref = document.getElementById('reference_agence').value.trim();
+            const email = document.getElementById('email').value.trim();
+            
+            if (ref && email && email.includes('@')) {
+                unlockSection('datesSection');
+            }
+        }
+        
+        function checkDatesSection() {
+            const datePrise = document.getElementById('date_prise').value;
+            const dateRestitution = document.getElementById('date_restitution').value;
+            
+            if (datePrise && dateRestitution && datePrise.length === 10 && dateRestitution.length === 10) {
+                calculateDays();
+                unlockSection('personalInfoSection');
+            }
+        }
+        
+        function checkPersonalInfoSection() {
+            const nom = document.getElementById('nom_complet').value.trim();
+            const adresse = document.getElementById('adresse_complete').value.trim();
+            const tel = document.getElementById('telephone').value.trim();
+            
+            if (nom && adresse && tel.length > 5) {
+                unlockSection('idDocSection');
+            }
+        }
+        
+        function checkIdDocSection() {
+            const numero = document.getElementById('numero_document').value.trim();
+            const emission = document.getElementById('date_emission_id').value;
+            const expiration = document.getElementById('date_expiration_id').value;
+            
+            if (numero && emission && expiration && emission.length === 10 && expiration.length === 10) {
+                unlockSection('licenseSection');
+            }
+        }
+        
+        function unlockSection(sectionId) {
+            document.getElementById(sectionId).classList.remove('locked');
+        }
+        
+        // Search Existing Client
+        document.getElementById('searchBtn').addEventListener('click', async function() {
+            const ref = document.getElementById('reference_agence').value.trim();
+            const email = document.getElementById('email').value.trim();
+            
+            if (!ref || !email) {
+                alert('⚠️ Veuillez remplir la référence et l\'email');
+                return;
+            }
+            
+            this.innerHTML = '<span class="spinner"></span> Recherche...';
+            this.disabled = true;
+            
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL + '?action=search&ref=' + encodeURIComponent(ref) + '&email=' + encodeURIComponent(email));
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Email de confirmation envoyé à ' + email + '\n\nVeuillez vérifier votre boîte de réception et cliquer sur le lien pour continuer.');
+                } else {
+                    alert('❌ Aucun client trouvé avec cette référence et cet email.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Erreur lors de la recherche. Veuillez réessayer.');
+            } finally {
+                this.innerHTML = '🔍 RECHERCHER';
+                this.disabled = false;
+            }
+        });
+        
+        // Fetch Existing Client Data
+        async function fetchExistingClientData(ref, token) {
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL + '?action=fetch&ref=' + encodeURIComponent(ref) + '&token=' + encodeURIComponent(token));
+                const data = await response.json();
+                
+                if (data.success && data.clientData) {
+                    isExistingClientData = true;
+                    populateFormWithExistingData(data.clientData);
+                    unlockAllSections();
+                } else {
+                    alert('❌ Impossible de récupérer les données du client.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Erreur lors de la récupération des données.');
+            }
+        }
+        
+        function populateFormWithExistingData(data) {
+            // Populate all fields
+            const fields = {
+                'reference_agence': data.reference_agence,
+                'email': data.email,
+                'date_prise': data.date_prise,
+                'date_restitution': data.date_restitution,
+                'nom_complet': data.nom_complet,
+                'adresse_complete': data.adresse_complete,
+                'telephone': data.telephone,
+                'numero_document': data.numero_document,
+                'date_emission_id': data.date_emission_id,
+                'date_expiration_id': data.date_expiration_id,
+                'numero_permis': data.numero_permis,
+                'date_emission_permis': data.date_emission_permis,
+                'date_expiration_permis': data.date_expiration_permis
+            };
+            
+            for (let [fieldId, value] of Object.entries(fields)) {
+                const input = document.getElementById(fieldId);
+                if (input && value) {
+                    input.value = value;
+                    input.disabled = true;
+                    
+                    // Add edit icon
+                    addEditIcon(fieldId);
+                }
+            }
+            
+            calculateDays();
+        }
+        
+        function addEditIcon(fieldId) {
+            const input = document.getElementById(fieldId);
+            const wrapper = input.parentElement;
+            
+            if (!wrapper.querySelector('.edit-icon')) {
+                const icon = document.createElement('span');
+                icon.className = 'edit-icon';
+                icon.innerHTML = '✏️';
+                icon.onclick = function() {
+                    input.disabled = false;
+                    input.focus();
+                    this.remove();
+                };
+                
+                wrapper.style.position = 'relative';
+                wrapper.appendChild(icon);
+            }
+        }
+        
+        function unlockAllSections() {
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('locked');
+            });
+        }
+        
+        // Calendar Functions
+        function initializeDateInputs() {
+            const dateInputs = document.querySelectorAll('.date-input input');
+            
+            dateInputs.forEach(input => {
+                input.addEventListener('click', function() {
+                    if (!this.disabled) {
+                        currentInputId = this.id;
+                        openCalendar();
+                    }
+                });
+            });
+        }
+        
+        function openCalendar() {
+            const overlay = document.getElementById('calendarOverlay');
+            overlay.classList.add('active');
+            
+            const input = document.getElementById(currentInputId);
+            if (input.value) {
+                const parts = input.value.split('/');
+                if (parts.length === 3) {
+                    currentCalendarDate = new Date(parts[2], parseInt(parts[1]) - 1, parts[0]);
+                }
+            }
+            
+            renderCalendar();
+        }
+        
+        function closeCalendar() {
+            document.getElementById('calendarOverlay').classList.remove('active');
+        }
+        
+        function changeMonth(delta) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
+            renderCalendar();
+        }
+        
+        function renderCalendar() {
+            const monthYear = document.getElementById('calendarMonthYear');
+            const grid = document.getElementById('calendarGrid');
+            
+            const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                          'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            
+            monthYear.textContent = months[currentCalendarDate.getMonth()] + ' ' + currentCalendarDate.getFullYear();
+            
+            // Clear grid
+            grid.innerHTML = '';
+            
+            // Day headers
+            const dayHeaders = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                header.textContent = day;
+                grid.appendChild(header);
+            });
+            
+            // Get first day of month
+            const firstDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
+            const lastDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0);
+            
+            // Previous month days
+            const firstDayOfWeek = firstDay.getDay();
+            for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+                const prevDate = new Date(firstDay);
+                prevDate.setDate(prevDate.getDate() - i - 1);
+                addCalendarDay(prevDate, true);
+            }
+            
+            // Current month days
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const date = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), day);
+                addCalendarDay(date, false);
+            }
+            
+            // Next month days
+            const remainingCells = 42 - grid.children.length + 7;
+            for (let i = 1; i <= remainingCells; i++) {
+                const nextDate = new Date(lastDay);
+                nextDate.setDate(nextDate.getDate() + i);
+                addCalendarDay(nextDate, true);
+            }
+        }
+        
+        function addCalendarDay(date, isOtherMonth) {
+            const grid = document.getElementById('calendarGrid');
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'calendar-day';
+            dayDiv.textContent = date.getDate();
+            
+            if (isOtherMonth) {
+                dayDiv.classList.add('other-month');
+            }
+            
+            // Check if today
+            const today = new Date();
+            if (date.toDateString() === today.toDateString()) {
+                dayDiv.classList.add('today');
+            }
+            
+            // Check if selected
+            const input = document.getElementById(currentInputId);
+            if (input.value) {
+                const parts = input.value.split('/');
+                const selectedDate = new Date(parts[2], parseInt(parts[1]) - 1, parts[0]);
+                if (date.toDateString() === selectedDate.toDateString()) {
+                    dayDiv.classList.add('selected');
+                }
+            }
+            
+            dayDiv.addEventListener('click', function() {
+                selectDate(date);
+            });
+            
+            grid.appendChild(dayDiv);
+        }
+        
+        function selectDate(date) {
+            const input = document.getElementById(currentInputId);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            
+            input.value = `${day}/${month}/${year}`;
+            closeCalendar();
+            
+            // Trigger validation
+            input.dispatchEvent(new Event('change'));
+        }
+        
+        // Calculate Days
+        function calculateDays() {
+            const datePrise = document.getElementById('date_prise').value;
+            const dateRestitution = document.getElementById('date_restitution').value;
+            
+            if (datePrise && dateRestitution && datePrise.length === 10 && dateRestitution.length === 10) {
+                const parts1 = datePrise.split('/');
+                const parts2 = dateRestitution.split('/');
+                
+                const date1 = new Date(parts1[2], parseInt(parts1[1]) - 1, parts1[0]);
+                const date2 = new Date(parts2[2], parseInt(parts2[1]) - 1, parts2[0]);
+                
+                const diffTime = Math.abs(date2 - date1);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                document.getElementById('daysCount').textContent = diffDays;
+                document.getElementById('daysDisplay').classList.add('show');
+            }
+        }
+        
+        // Phone Validation
+        function initializePhoneValidation() {
+            const phoneInput = document.getElementById('telephone');
+            
+            phoneInput.addEventListener('input', function(e) {
+                let value = this.value;
+                
+                if (!value.startsWith('+')) {
+                    value = '+' + value.replace(/\+/g, '');
+                }
+                
+                value = '+' + value.substring(1).replace(/\D/g, '');
+                this.value = value;
+            });
+            
+            phoneInput.addEventListener('keydown', function(e) {
+                if ((e.key === 'Backspace' || e.key === 'Delete') && this.value === '+') {
+                    e.preventDefault();
+                }
+                if (this.selectionStart === 0 && this.selectionEnd === 0 && e.key === 'Backspace') {
+                    e.preventDefault();
+                }
+            });
+        }
+        
+        // Address Validation
+        function initializeAddressValidation() {
+            const addressTextarea = document.getElementById('adresse_complete');
+            
+            addressTextarea.addEventListener('input', function() {
+                const lines = this.value.split('\n');
+                if (lines.length > 3) {
+                    this.value = lines.slice(0, 3).join('\n');
+                }
+            });
+            
+            addressTextarea.addEventListener('keydown', function(e) {
+                const lines = this.value.split('\n');
+                if (e.key === 'Enter' && lines.length >= 3) {
+                    e.preventDefault();
+                }
+            });
+        }
+        
+        // Date Validation
+        function validateExpirationDate(expirationInputId, errorMessageId) {
+            const restitutionInput = document.getElementById('date_restitution');
+            const expirationInput = document.getElementById(expirationInputId);
+            const errorMessage = document.getElementById(errorMessageId);
+            
+            if (restitutionInput.value.length === 10 && expirationInput.value.length === 10) {
+                const restitutionDate = parseDateString(restitutionInput.value);
+                const expirationDate = parseDateString(expirationInput.value);
+                
+                if (restitutionDate && expirationDate) {
+                    if (expirationDate <= restitutionDate) {
+                        expirationInput.classList.add('error');
+                        errorMessage.classList.add('show');
+                        return false;
+                    } else {
+                        expirationInput.classList.remove('error');
+                        errorMessage.classList.remove('show');
+                        return true;
+                    }
+                }
+            } else {
+                expirationInput.classList.remove('error');
+                errorMessage.classList.remove('show');
+            }
+            return true;
+        }
+        
+        function parseDateString(dateStr) {
+            if (dateStr.length !== 10) return null;
+            const parts = dateStr.split('/');
+            if (parts.length !== 3) return null;
+            
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const year = parseInt(parts[2], 10);
+            
+            if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+            
+            return new Date(year, month, day);
+        }
+        
+        // Clear Form
+        function clearForm() {
+            if (confirm('Êtes-vous sûr de vouloir effacer tous les champs?')) {
+                document.getElementById('driverForm').reset();
+                document.getElementById('telephone').value = '+';
+                
+                // Reset client type
+                clientType = null;
+                isExistingClientData = false;
+                document.querySelectorAll('.client-type-btn').forEach(btn => btn.classList.remove('active'));
+                
+                // Lock all sections
+                document.querySelectorAll('.form-section').forEach(section => {
+                    section.classList.add('locked');
+                });
+                
+                // Remove edit icons
+                document.querySelectorAll('.edit-icon').forEach(icon => icon.remove());
+                
+                // Enable all inputs
+                document.querySelectorAll('input, textarea').forEach(input => {
+                    input.disabled = false;
+                });
+                
+                // Hide days display
+                document.getElementById('daysDisplay').classList.remove('show');
+                
+                // Clear errors
+                document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+                document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+            }
+        }
+        
+        // Export to PDF
+        function exportToPDF() {
+            const form = document.getElementById('driverForm');
+            if (!form.checkValidity()) {
+                alert('Veuillez remplir tous les champs obligatoires.');
+                form.reportValidity();
+                return;
+            }
+            
+            const validId = validateExpirationDate('date_expiration_id', 'error_expiration_id');
+            const validPermis = validateExpirationDate('date_expiration_permis', 'error_expiration_permis');
+            
+            if (!validId || !validPermis) {
+                alert('⚠️ Attention: Les dates d\'expiration des documents doivent être postérieures à la date de restitution du véhicule.');
+                return;
+            }
+            
+            window.print();
+        }
+        
+        // Submit to Google Sheets
+        async function submitToSheets() {
+            const form = document.getElementById('driverForm');
+            if (!form.checkValidity()) {
+                alert('Veuillez remplir tous les champs obligatoires.');
+                form.reportValidity();
+                return;
+            }
+            
+            const validId = validateExpirationDate('date_expiration_id', 'error_expiration_id');
+            const validPermis = validateExpirationDate('date_expiration_permis', 'error_expiration_permis');
+            
+            if (!validId || !validPermis) {
+                alert('⚠️ Attention: Les dates d\'expiration des documents doivent être postérieures à la date de restitution du véhicule.');
+                return;
+            }
+            
+            // Collect form data
+            const formData = {
+                client_type: clientType,
+                is_modification: isExistingClientData,
+                reference_agence: document.getElementById('reference_agence').value,
+                email: document.getElementById('email').value,
+                date_prise: document.getElementById('date_prise').value,
+                date_restitution: document.getElementById('date_restitution').value,
+                jours: document.getElementById('daysCount').textContent,
+                nom_complet: document.getElementById('nom_complet').value,
+                adresse_complete: document.getElementById('adresse_complete').value,
+                telephone: document.getElementById('telephone').value,
+                numero_document: document.getElementById('numero_document').value,
+                date_emission_id: document.getElementById('date_emission_id').value,
+                date_expiration_id: document.getElementById('date_expiration_id').value,
+                numero_permis: document.getElementById('numero_permis').value,
+                date_emission_permis: document.getElementById('date_emission_permis').value,
+                date_expiration_permis: document.getElementById('date_expiration_permis').value,
+                timestamp: new Date().toLocaleString('fr-FR')
+            };
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="spinner"></span> Envoi en cours...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                alert('✅ Formulaire envoyé avec succès!');
+                
+                if (confirm('Voulez-vous effacer le formulaire?')) {
+                    clearForm();
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Erreur lors de l\'envoi. Veuillez réessayer.');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
